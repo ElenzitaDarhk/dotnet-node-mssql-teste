@@ -1,51 +1,62 @@
+using ApiTeste.Application.Services;
+using ApiTeste.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ApiTeste.Controller
 {
-    [Route("api/Alunos")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AlunosController : ControllerBase
     {
+        private readonly AlunoService _service;
+
+        public AlunosController(AlunoService service)
+        {
+            _service = service;
+        }
+
         // GET: api/Alunos
         [HttpGet]
-        public IActionResult Get()
+        public async Task<ActionResult<IEnumerable<Aluno>>> Get()
         {
-            // Retorna lista de alunos (exemplo)
-            var alunos = new[] { "João", "Maria", "Pedro" };
+            var alunos = await _service.ListarAlunosAsync();
             return Ok(alunos);
         }
 
         // GET: api/Alunos/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<ActionResult<Aluno>> Get(int id)
         {
-            // Retorna aluno por id (exemplo)
-            var aluno = $"Aluno {id}";
+            var aluno = await _service.BuscarAlunoPorIdAsync(id);
+            if (aluno == null) return NotFound();
             return Ok(aluno);
         }
 
         // POST: api/Alunos
         [HttpPost]
-        public IActionResult Post([FromBody] string aluno)
+        public async Task<ActionResult> Post([FromBody] Aluno aluno)
         {
-            // Adiciona novo aluno (exemplo)
-            return CreatedAtAction(nameof(Get), new { id = 1 }, aluno);
+            await _service.InserirAlunoAsync(aluno);
+            return CreatedAtAction(nameof(Get), new { id = aluno.Id }, aluno);
         }
 
         // PUT: api/Alunos/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string aluno)
+        public async Task<ActionResult> Put(int id, [FromBody] Aluno aluno)
         {
-            // Atualiza aluno (exemplo)
+            if (id != aluno.Id) return BadRequest();
+            await _service.AlterarAlunoAsync(aluno);
             return NoContent();
         }
 
         // DELETE: api/Alunos/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            // Remove aluno (exemplo)
+            await _service.ExcluirAlunoAsync(id);
             return NoContent();
         }
     }
