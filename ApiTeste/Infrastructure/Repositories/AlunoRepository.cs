@@ -5,33 +5,39 @@ using System.Threading.Tasks;
 
 namespace ApiTeste.Infrastructure.Repositories
 {
+    public class EscolaDbContext : DbContext
+    {
+        public EscolaDbContext(DbContextOptions<EscolaDbContext> options) : base(options) { }
+        public DbSet<Aluno> Alunos { get; set; }
+    }
+
     public class AlunoRepository
     {
-        private readonly DbContext _context;
-        public AlunoRepository(DbContext context)
+        private readonly EscolaDbContext _context;
+        public AlunoRepository(EscolaDbContext context)
         {
             _context = context;
         }
 
         public async Task<IEnumerable<Aluno>> GetAllAsync()
         {
-            return await _context.Set<Aluno>().ToListAsync();
+            return await _context.Alunos.ToListAsync();
         }
 
         public async Task<Aluno?> GetByIdAsync(int id)
         {
-            return await _context.Set<Aluno>().FindAsync(id);
+            return await _context.Alunos.FindAsync(id);
         }
 
         public async Task AddAsync(Aluno aluno)
         {
-            await _context.Set<Aluno>().AddAsync(aluno);
+            await _context.Alunos.AddAsync(aluno);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Aluno aluno)
         {
-            _context.Set<Aluno>().Update(aluno);
+            _context.Alunos.Update(aluno);
             await _context.SaveChangesAsync();
         }
 
@@ -40,7 +46,7 @@ namespace ApiTeste.Infrastructure.Repositories
             var aluno = await GetByIdAsync(id);
             if (aluno != null)
             {
-                _context.Set<Aluno>().Remove(aluno);
+                _context.Alunos.Remove(aluno);
                 await _context.SaveChangesAsync();
             }
         }

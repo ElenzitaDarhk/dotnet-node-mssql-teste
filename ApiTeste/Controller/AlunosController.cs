@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ApiTeste.Controller
 {
-    [Route("api/[controller]")]
+    [Route("api/Alunos")]
     [ApiController]
     public class AlunosController : ControllerBase
     {
